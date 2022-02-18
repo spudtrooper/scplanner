@@ -18,37 +18,12 @@ type TradeContractsSearchInfo struct {
 }
 
 type TradeContractsSearchResult struct {
-	ID      string `json:"id"`
-	Created int64  `json:"created"`
-	Updated int64  `json:"updated"`
-	UserID  string `json:"userId"`
-	Dsp     string `json:"dsp"`
-	Media   struct {
-		ID         string `json:"id"`
-		Created    int64  `json:"created"`
-		Updated    int64  `json:"updated"`
-		Dsp        string `json:"dsp"`
-		Type       string `json:"type"`
-		ExternalID string `json:"externalId"`
-		OwnerID    string `json:"ownerId"`
-		Metadata   struct {
-			ID       string `json:"id"`
-			Name     string `json:"name"`
-			URL      string `json:"url"`
-			ImageURL string `json:"imageUrl"`
-			OwnerID  string `json:"ownerId"`
-			Stats    struct {
-				Followers  interface{} `json:"followers"`
-				Plays      int         `json:"plays"`
-				Reposts    int         `json:"reposts"`
-				Comments   int         `json:"comments"`
-				Likes      int         `json:"likes"`
-				Popularity interface{} `json:"popularity"`
-			} `json:"stats"`
-		} `json:"metadata"`
-		JoinDate interface{} `json:"joinDate"`
-		LastSync interface{} `json:"lastSync"`
-	} `json:"media"`
+	ID       string    `json:"id"`
+	Created  int64     `json:"created"`
+	Updated  int64     `json:"updated"`
+	UserID   string    `json:"userId"`
+	Dsp      string    `json:"dsp"`
+	Media    MediaInfo `json:"media"`
 	Variants []struct {
 		MinimumFollowers int `json:"minimumFollowers"`
 		Targets          []struct {
@@ -162,122 +137,20 @@ type BidsInfo struct {
 }
 
 type BidsResult struct {
-	ID                   string `json:"id"`
-	Created              int64  `json:"created"`
-	Updated              int64  `json:"updated"`
-	BidderUserID         string `json:"bidderUserId"`
-	ContractAuthorUserID string `json:"contractAuthorUserId"`
-	Dsp                  string `json:"dsp"`
-	ContractID           string `json:"contractId"`
-	ContractMedia        struct {
-		ID         string `json:"id"`
-		Created    int64  `json:"created"`
-		Updated    int64  `json:"updated"`
-		Dsp        string `json:"dsp"`
-		Type       string `json:"type"`
-		ExternalID string `json:"externalId"`
-		OwnerID    string `json:"ownerId"`
-		Metadata   struct {
-			ID       string `json:"id"`
-			Name     string `json:"name"`
-			URL      string `json:"url"`
-			ImageURL string `json:"imageUrl"`
-			OwnerID  string `json:"ownerId"`
-			Stats    struct {
-				Followers  interface{} `json:"followers"`
-				Plays      int         `json:"plays"`
-				Reposts    int         `json:"reposts"`
-				Comments   int         `json:"comments"`
-				Likes      int         `json:"likes"`
-				Popularity interface{} `json:"popularity"`
-			} `json:"stats"`
-		} `json:"metadata"`
-		JoinDate interface{} `json:"joinDate"`
-		LastSync interface{} `json:"lastSync"`
-	} `json:"contractMedia"`
-	BidMedia struct {
-		ID         string `json:"id"`
-		Created    int64  `json:"created"`
-		Updated    int64  `json:"updated"`
-		Dsp        string `json:"dsp"`
-		Type       string `json:"type"`
-		ExternalID string `json:"externalId"`
-		OwnerID    string `json:"ownerId"`
-		Metadata   struct {
-			ID       string `json:"id"`
-			Name     string `json:"name"`
-			URL      string `json:"url"`
-			ImageURL string `json:"imageUrl"`
-			OwnerID  string `json:"ownerId"`
-			Stats    struct {
-				Followers  interface{} `json:"followers"`
-				Plays      int         `json:"plays"`
-				Reposts    int         `json:"reposts"`
-				Comments   int         `json:"comments"`
-				Likes      int         `json:"likes"`
-				Popularity interface{} `json:"popularity"`
-			} `json:"stats"`
-		} `json:"metadata"`
-		JoinDate interface{} `json:"joinDate"`
-		LastSync interface{} `json:"lastSync"`
-	} `json:"bidMedia"`
-	ContractTargets []struct {
-		ID         string `json:"id"`
-		Created    int64  `json:"created"`
-		Updated    int64  `json:"updated"`
-		Dsp        string `json:"dsp"`
-		Type       string `json:"type"`
-		ExternalID string `json:"externalId"`
-		OwnerID    string `json:"ownerId"`
-		Metadata   struct {
-			ID       string      `json:"id"`
-			Name     string      `json:"name"`
-			URL      string      `json:"url"`
-			ImageURL string      `json:"imageUrl"`
-			OwnerID  interface{} `json:"ownerId"`
-			Stats    struct {
-				Followers  int         `json:"followers"`
-				Plays      interface{} `json:"plays"`
-				Reposts    interface{} `json:"reposts"`
-				Comments   interface{} `json:"comments"`
-				Likes      interface{} `json:"likes"`
-				Popularity interface{} `json:"popularity"`
-			} `json:"stats"`
-		} `json:"metadata"`
-		JoinDate int64 `json:"joinDate"`
-		LastSync int64 `json:"lastSync"`
-	} `json:"contractTargets"`
-	BidTargets           []BidTarget `json:"bidTargets"`
-	Status               string      `json:"status"`
-	SelectedVariantIndex int         `json:"selectedVariantIndex"`
-	RetryCount           int         `json:"retryCount"`
-}
-
-type BidTarget struct {
-	ID         string      `json:"id"`
-	Created    int64       `json:"created"`
-	Updated    int64       `json:"updated"`
-	Dsp        string      `json:"dsp"`
-	Type       string      `json:"type"`
-	ExternalID string      `json:"externalId"`
-	OwnerID    interface{} `json:"ownerId"`
-	Metadata   struct {
-		ID       string      `json:"id"`
-		Name     string      `json:"name"`
-		URL      string      `json:"url"`
-		ImageURL string      `json:"imageUrl"`
-		OwnerID  interface{} `json:"ownerId"`
-		Stats    struct {
-			Followers  int         `json:"followers"`
-			Plays      interface{} `json:"plays"`
-			Reposts    interface{} `json:"reposts"`
-			Comments   interface{} `json:"comments"`
-			Likes      interface{} `json:"likes"`
-			Popularity interface{} `json:"popularity"`
-		} `json:"stats"`
-	} `json:"metadata"`
-	JoinDate interface{} `json:"joinDate"`
-	LastSync interface{} `json:"lastSync"`
+	ID                   string       `json:"id"`
+	Created              int64        `json:"created"`
+	Updated              int64        `json:"updated"`
+	BidderUserID         string       `json:"bidderUserId"`
+	ContractAuthorUserID string       `json:"contractAuthorUserId"`
+	Dsp                  string       `json:"dsp"`
+	ContractID           string       `json:"contractId"`
+	ContractMedia        MediaInfo    `json:"contractMedia"`
+	BidMedia             MediaInfo    `json:"bidMedia"`
+	ContractTargets      []TargetInfo `json:"contractTargets"`
+	BidTargets           []TargetInfo `json:"bidTargets"`
+	Status               string       `json:"status"`
+	SelectedVariantIndex int          `json:"selectedVariantIndex"`
+	RetryCount           int          `json:"retryCount"`
 }
 
 func (c *core) Bids(cOpts ...BidsOption) (*BidsInfo, error) {
@@ -384,12 +257,12 @@ type TargetInfo struct {
 }
 
 type TradeContractsInfo struct {
-	ID       string     `json:"id"`
-	Created  int64      `json:"created"`
-	Updated  int64      `json:"updated"`
-	UserID   string     `json:"userId"`
-	Dsp      string     `json:"dsp"`
-	Media    TargetInfo `json:"media"`
+	ID       string    `json:"id"`
+	Created  int64     `json:"created"`
+	Updated  int64     `json:"updated"`
+	UserID   string    `json:"userId"`
+	Dsp      string    `json:"dsp"`
+	Media    MediaInfo `json:"media"`
 	Variants []struct {
 		MinimumFollowers int          `json:"minimumFollowers"`
 		Targets          []TargetInfo `json:"targets"`
