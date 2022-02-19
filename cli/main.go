@@ -170,6 +170,7 @@ func Main(ctx context.Context) error {
 		}
 
 		existingSet := map[string]bool{}
+		var numBids int
 		bidss, errs, err := client.Bidss()
 		if err != nil {
 			return err
@@ -177,7 +178,8 @@ func Main(ctx context.Context) error {
 		parallel.WaitFor(func() {
 			for rs := range bidss {
 				for _, r := range rs.Results {
-					existingSet[r.ID] = true
+					existingSet[r.ContractID] = true
+					numBids++
 				}
 			}
 		}, func() {
@@ -185,7 +187,8 @@ func Main(ctx context.Context) error {
 				log.Printf("error: %v", e)
 			}
 		})
-		log.Printf("have %d existing bids", len(existingSet))
+		log.Printf("have %d existing bids", numBids)
+		log.Printf("have %d unique bids", len(existingSet))
 
 		resolvedTarget, err := client.Resolve(*url)
 		if err != nil {
