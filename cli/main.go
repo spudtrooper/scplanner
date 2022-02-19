@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"log"
+	"flag"
 	"strings"
+	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/spudtrooper/goutil/check"
@@ -13,6 +14,7 @@ import (
 	"github.com/spudtrooper/goutil/parallel"
 	minimalcli "github.com/spudtrooper/minimalcli/app"
 	"github.com/spudtrooper/scplanner/api"
+	"github.com/spudtrooper/scplanner/log"
 )
 
 var (
@@ -22,6 +24,7 @@ var (
 	url              = flags.String("url", "global URL")
 	maximumFollowers = flags.Int("maximum_followers", "global maximumFollowers")
 	mininumFollowers = flags.Int("mininum_followers", "global mininumFollowers")
+	threads          = flag.Int("threads", 10, "number of threads to use in async things")
 )
 
 func Main(ctx context.Context) error {
@@ -43,6 +46,24 @@ func Main(ctx context.Context) error {
 		)
 	}
 
+	tradeContractsSearches := func() (chan api.OffsetTradeContractsSearchResults, chan error, error) {
+		return client.TradeContractsSearches(
+			api.TradeContractsSearchPage(*page),
+			api.TradeContractsSearchGenre(*genre),
+			api.TradeContractsSearchMaximumFollowers(*maximumFollowers),
+			api.TradeContractsSearchMinimumFollowers(*mininumFollowers),
+		)
+	}
+
+	tradeContractsSearchesFlat := func() (chan api.TradeContractsSearchResult, chan error, error) {
+		return client.TradeContractsSearchesFlat(
+			api.TradeContractsSearchPage(*page),
+			api.TradeContractsSearchGenre(*genre),
+			api.TradeContractsSearchMaximumFollowers(*maximumFollowers),
+			api.TradeContractsSearchMinimumFollowers(*mininumFollowers),
+		)
+	}
+
 	app.Register("TradeContractsSearch", func(context.Context) error {
 		info, err := tradeContractsSearch()
 		if err != nil {
@@ -53,12 +74,7 @@ func Main(ctx context.Context) error {
 	})
 
 	app.Register("TradeContractsSearches", func(context.Context) error {
-		resultss, errs, err := client.TradeContractsSearches(
-			api.TradeContractsSearchPage(*page),
-			api.TradeContractsSearchGenre(*genre),
-			api.TradeContractsSearchMaximumFollowers(*maximumFollowers),
-			api.TradeContractsSearchMinimumFollowers(*mininumFollowers),
-		)
+		resultss, errs, err := tradeContractsSearches()
 		if err != nil {
 			return err
 		}
@@ -133,7 +149,7 @@ func Main(ctx context.Context) error {
 		return nil
 	})
 
-	app.Register("Bid", func(context.Context) error {
+	app.Register("CreateBid", func(context.Context) error {
 		requireStringFlag(id, "id")
 		requireStringFlag(url, "url")
 
@@ -147,7 +163,7 @@ func Main(ctx context.Context) error {
 			return err
 		}
 
-		bidInfo, err := client.Bid(*id, *authInfo, *resolvedTarget)
+		bidInfo, err := client.CreateBid(*id, *authInfo, *resolvedTarget)
 		if err != nil {
 			return err
 		}
@@ -156,13 +172,47 @@ func Main(ctx context.Context) error {
 		return nil
 	})
 
-	app.Register("SearchAndBid", func(context.Context) error {
-		requireStringFlag(url, "url")
+	app.Register("DeleteBid", func(context.Context) error {
+		requireStringFlag(id, "id")
 
-		info, err := tradeContractsSearch()
+		bidInfo, err := client.DeleteBid(*id)
 		if err != nil {
 			return err
 		}
+		log.Printf("DeleteBid: %s", mustFormatString(bidInfo))
+
+		return nil
+	})
+
+	app.Register("DeleteAllBids", func(context.Context) error {
+		bidss, errs, err := client.Bidss()
+		if err != nil {
+			return err
+		}
+		parallel.WaitFor(func() {
+			del := 0
+			for rs := range bidss {
+				for _, r := range rs.Results {
+					id := r.ID
+					if _, err := client.DeleteBid(id); err != nil {
+						log.Printf("error: %v", err)
+						continue
+					}
+					log.Printf("deleted[%d]: %s", del, id)
+					del++
+				}
+			}
+		}, func() {
+			for e := range errs {
+				log.Printf("error: %v", e)
+			}
+		})
+
+		return nil
+	})
+
+	app.Register("SearchAndBid", func(context.Context) error {
+		requireStringFlag(url, "url")
 
 		authInfo, err := client.Auth()
 		if err != nil {
@@ -195,17 +245,36 @@ func Main(ctx context.Context) error {
 			return err
 		}
 
-		for _, r := range info.Results {
-			if exists := existingSet[r.ID]; exists {
-				log.Printf("skipping %s because it already exists", r.ID)
-				continue
-			}
-			bidInfo, err := client.Bid(r.ID, *authInfo, *resolvedTarget)
-			if err != nil {
-				return err
-			}
-			log.Printf("created bid: %s", bidInfo.ID)
+		resultss, errs, err := tradeContractsSearchesFlat()
+		if err != nil {
+			return err
 		}
+		parallel.WaitFor(func() {
+			var wg sync.WaitGroup
+			for i := 0; i < *threads; i++ {
+				wg.Add(1)
+				go func() {
+					for r := range resultss {
+						if exists := existingSet[r.ID]; exists {
+							log.Printf("skipping %s because it already exists", r.ID)
+							continue
+						}
+						bidInfo, err := client.CreateBid(r.ID, *authInfo, *resolvedTarget)
+						if err != nil {
+							log.Printf("error: %v", err)
+						} else {
+							log.Printf("created bid: %s", bidInfo.ID)
+						}
+					}
+				}()
+			}
+			wg.Done()
+		}, func() {
+			for e := range errs {
+				log.Printf("error: %v", e)
+			}
+		})
+
 		return nil
 	})
 

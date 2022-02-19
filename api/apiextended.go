@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/spudtrooper/goutil/or"
+	"github.com/spudtrooper/scplanner/log"
 )
 
 // type extended has functions the use the Core API to produce multiple results.
@@ -19,6 +20,24 @@ func MakeExtended(c *core) *extended {
 type OffsetTradeContractsSearchResults struct {
 	Offset  int
 	Results []TradeContractsSearchResult
+}
+
+func (c *extended) TradeContractsSearchesFlat(tOpts ...TradeContractsSearchOption) (chan TradeContractsSearchResult, chan error, error) {
+	resss, errs, err := c.TradeContractsSearches(tOpts...)
+	if err != nil {
+		return nil, nil, err
+	}
+	ress := make(chan TradeContractsSearchResult)
+
+	go func() {
+		for rs := range resss {
+			for _, r := range rs.Results {
+				ress <- r
+			}
+		}
+	}()
+
+	return ress, errs, nil
 }
 
 func (c *extended) TradeContractsSearches(tOpts ...TradeContractsSearchOption) (chan OffsetTradeContractsSearchResults, chan error, error) {
@@ -36,7 +55,8 @@ func (c *extended) TradeContractsSearches(tOpts ...TradeContractsSearchOption) (
 
 	go func() {
 		limit := initialInfo.Pages
-		for offset := start; offset < limit; offset++ {
+		log.Printf("have %d pages", limit)
+		for offset := start; offset <= limit; offset++ {
 			offsets <- offset
 		}
 		close(offsets)

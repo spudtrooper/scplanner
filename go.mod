@@ -8,7 +8,7 @@ replace github.com/spudtrooper/minimalcli => ../minimalcli
 
 require (
 	github.com/pkg/errors v0.9.1
-	github.com/spudtrooper/goutil v0.1.46
+	github.com/spudtrooper/goutil v0.1.47
 	github.com/spudtrooper/minimalcli v0.0.0-00010101000000-000000000000
 )
 

@@ -353,6 +353,74 @@ type BidInfo struct {
 	RetryCount           int          `json:"retryCount"`
 }
 
+func (c *core) CreateBid(contractId string, auth AuthInfo, bidMedia TargetInfo, cOpts ...CreateBidOption) (*BidInfo, error) {
+	opts := MakeCreateBidOptions(cOpts...)
+	dsp := or.String(opts.Dsp(), "SOUNDCLOUD")
+	params := []param{
+		{"userId", auth.ID},
+	}
+	route := createRoute("bids", params...)
+	type bid struct {
+		Dsp        string      `json:"dsp"`
+		Type       string      `json:"type"`
+		ExternalID string      `json:"externalId"`
+		OwnerID    interface{} `json:"ownerId"`
+		Metadata   interface{} `json:"metadata"`
+		ID         interface{} `json:"id"`
+		Created    interface{} `json:"created"`
+		Updated    interface{} `json:"updated"`
+	}
+	type data struct {
+		BidderUserID         interface{} `json:"bidderUserId"`
+		ContractAuthorUserID interface{} `json:"contractAuthorUserId"`
+		Dsp                  string      `json:"dsp"`
+		ContractID           string      `json:"contractId"`
+		ContractMedia        interface{} `json:"contractMedia"`
+		BidMedia             bid         `json:"bidMedia"`
+		ContractTargets      interface{} `json:"contractTargets"`
+		BidTargets           []bid       `json:"bidTargets"`
+		Status               interface{} `json:"status"`
+		SelectedVariantIndex int         `json:"selectedVariantIndex"`
+		ID                   interface{} `json:"id"`
+		Created              interface{} `json:"created"`
+		Updated              interface{} `json:"updated"`
+	}
+	bodyData := data{
+		Dsp:        dsp,
+		ContractID: contractId,
+		BidMedia: bid{
+			Dsp:        bidMedia.Dsp,
+			Type:       bidMedia.Type,
+			ExternalID: bidMedia.ExternalID,
+		},
+		BidTargets: []bid{{
+			Dsp:        dsp,
+			Type:       "USER",
+			ExternalID: auth.ExternalID,
+		}},
+	}
+	if opts.DebugBody() {
+		j, err := formatAsJSON(&bodyData)
+		if err != nil {
+			log.Printf("ignoring: %v", err)
+		} else {
+			log.Printf("bodyData: %s", j)
+		}
+	}
+	body, err := jsonMarshal(&bodyData)
+	if err != nil {
+		return nil, err
+	}
+	extraHeaders := map[string]string{
+		"content-type": "application/json",
+	}
+	var payload BidInfo
+	if _, err := c.post(route, &payload, bytes.NewBuffer(body), RequestExtraHeaders(extraHeaders)); err != nil {
+		return nil, err
+	}
+	return &payload, nil
+}
+
 func (c *core) Bid(contractId string, auth AuthInfo, bidMedia TargetInfo, cOpts ...BidOption) (*BidInfo, error) {
 	opts := MakeBidOptions(cOpts...)
 	dsp := or.String(opts.Dsp(), "SOUNDCLOUD")
@@ -416,6 +484,15 @@ func (c *core) Bid(contractId string, auth AuthInfo, bidMedia TargetInfo, cOpts 
 	}
 	var payload BidInfo
 	if _, err := c.post(route, &payload, bytes.NewBuffer(body), RequestExtraHeaders(extraHeaders)); err != nil {
+		return nil, err
+	}
+	return &payload, nil
+}
+
+func (c *core) DeleteBid(contractID string) (interface{}, error) {
+	route := createRoute(fmt.Sprintf("bids/%s", contractID))
+	var payload interface{}
+	if _, err := c.delete(route, &payload); err != nil {
 		return nil, err
 	}
 	return &payload, nil
