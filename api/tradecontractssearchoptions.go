@@ -1,6 +1,6 @@
 package api
 
-// genopts --opt_type=TradeContractsSearchOption --prefix=TradeContractsSearch --outfile=api/tradecontractssearchoptions.go 'page:int' 'size:int' 'dsp:string' 'genre:string' 'minimumFollowers:int' 'maximumFollowers:int'
+//go:generate genopts --opt_type=TradeContractsSearchOption --prefix=TradeContractsSearch --outfile=tradecontractssearchoptions.go "page:int" "size:int" "dsp:string" "genre:string" "minimumFollowers:int" "maximumFollowers:int"
 
 type TradeContractsSearchOption func(*tradeContractsSearchOptionImpl)
 

@@ -1,6 +1,6 @@
 package api
 
-// genopts --opt_type=DeleteBidOption --prefix=DeleteBid --outfile=api/deletebidoptions.go 'status:string' 'dsp:string' 'bidderUserId:string' 'lastEvaluatedKey:LastEvaluatedKeyInfo'
+//go:generate genopts --opt_type=DeleteBidOption --prefix=DeleteBid --outfile=deletebidoptions.go "status:string" "dsp:string" "bidderUserId:string" "lastEvaluatedKey:LastEvaluatedKeyInfo"
 
 type DeleteBidOption func(*deleteBidOptionImpl)
 

@@ -1,6 +1,6 @@
 package api
 
-// genopts --opt_type=BidsOption --prefix=Bids --outfile=api/bidsoptions.go 'status:string' 'dsp:string' 'bidderUserId:string' 'lastEvaluatedKey:LastEvaluatedKeyInfo'
+//go:generate genopts --opt_type=BidsOption --prefix=Bids --outfile=bidsoptions.go "status:string" "dsp:string" "bidderUserId:string" "lastEvaluatedKey:LastEvaluatedKeyInfo"
 
 type BidsOption func(*bidsOptionImpl)
 
