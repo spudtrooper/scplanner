@@ -1,6 +1,6 @@
 package api
 
-//go:generate genopts --opt_type=CreateBidOption --prefix=CreateBid --outfile=createbidoptions.go "dsp:string" "bidderUserId:string" "contractID:string" "debugBody"
+//go:generate genopts --prefix=CreateBid --outfile=api/createbidoptions.go "dsp:string" "bidderUserId:string" "contractID:string" "debugBody"
 
 type CreateBidOption func(*createBidOptionImpl)
 
@@ -16,10 +16,20 @@ func CreateBidDsp(dsp string) CreateBidOption {
 		opts.dsp = dsp
 	}
 }
+func CreateBidDspFlag(dsp *string) CreateBidOption {
+	return func(opts *createBidOptionImpl) {
+		opts.dsp = *dsp
+	}
+}
 
 func CreateBidBidderUserId(bidderUserId string) CreateBidOption {
 	return func(opts *createBidOptionImpl) {
 		opts.bidderUserId = bidderUserId
+	}
+}
+func CreateBidBidderUserIdFlag(bidderUserId *string) CreateBidOption {
+	return func(opts *createBidOptionImpl) {
+		opts.bidderUserId = *bidderUserId
 	}
 }
 
@@ -28,10 +38,20 @@ func CreateBidContractID(contractID string) CreateBidOption {
 		opts.contractID = contractID
 	}
 }
+func CreateBidContractIDFlag(contractID *string) CreateBidOption {
+	return func(opts *createBidOptionImpl) {
+		opts.contractID = *contractID
+	}
+}
 
 func CreateBidDebugBody(debugBody bool) CreateBidOption {
 	return func(opts *createBidOptionImpl) {
 		opts.debugBody = debugBody
+	}
+}
+func CreateBidDebugBodyFlag(debugBody *bool) CreateBidOption {
+	return func(opts *createBidOptionImpl) {
+		opts.debugBody = *debugBody
 	}
 }
 

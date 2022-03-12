@@ -1,6 +1,6 @@
 package api
 
-//go:generate genopts --opt_type=DeleteBidOption --prefix=DeleteBid --outfile=deletebidoptions.go "status:string" "dsp:string" "bidderUserId:string" "lastEvaluatedKey:LastEvaluatedKeyInfo"
+//go:generate genopts --prefix=DeleteBid --outfile=api/deletebidoptions.go "status:string" "dsp:string" "bidderUserId:string" "lastEvaluatedKey:LastEvaluatedKeyInfo"
 
 type DeleteBidOption func(*deleteBidOptionImpl)
 
@@ -16,10 +16,20 @@ func DeleteBidStatus(status string) DeleteBidOption {
 		opts.status = status
 	}
 }
+func DeleteBidStatusFlag(status *string) DeleteBidOption {
+	return func(opts *deleteBidOptionImpl) {
+		opts.status = *status
+	}
+}
 
 func DeleteBidDsp(dsp string) DeleteBidOption {
 	return func(opts *deleteBidOptionImpl) {
 		opts.dsp = dsp
+	}
+}
+func DeleteBidDspFlag(dsp *string) DeleteBidOption {
+	return func(opts *deleteBidOptionImpl) {
+		opts.dsp = *dsp
 	}
 }
 
@@ -28,10 +38,20 @@ func DeleteBidBidderUserId(bidderUserId string) DeleteBidOption {
 		opts.bidderUserId = bidderUserId
 	}
 }
+func DeleteBidBidderUserIdFlag(bidderUserId *string) DeleteBidOption {
+	return func(opts *deleteBidOptionImpl) {
+		opts.bidderUserId = *bidderUserId
+	}
+}
 
 func DeleteBidLastEvaluatedKey(lastEvaluatedKey LastEvaluatedKeyInfo) DeleteBidOption {
 	return func(opts *deleteBidOptionImpl) {
 		opts.lastEvaluatedKey = lastEvaluatedKey
+	}
+}
+func DeleteBidLastEvaluatedKeyFlag(lastEvaluatedKey *LastEvaluatedKeyInfo) DeleteBidOption {
+	return func(opts *deleteBidOptionImpl) {
+		opts.lastEvaluatedKey = *lastEvaluatedKey
 	}
 }
 

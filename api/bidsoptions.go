@@ -1,6 +1,6 @@
 package api
 
-//go:generate genopts --opt_type=BidsOption --prefix=Bids --outfile=bidsoptions.go "status:string" "dsp:string" "bidderUserId:string" "lastEvaluatedKey:LastEvaluatedKeyInfo"
+//go:generate genopts --prefix=Bids --outfile=api/bidsoptions.go "status:string" "dsp:string" "bidderUserId:string" "lastEvaluatedKey:LastEvaluatedKeyInfo"
 
 type BidsOption func(*bidsOptionImpl)
 
@@ -16,10 +16,20 @@ func BidsStatus(status string) BidsOption {
 		opts.status = status
 	}
 }
+func BidsStatusFlag(status *string) BidsOption {
+	return func(opts *bidsOptionImpl) {
+		opts.status = *status
+	}
+}
 
 func BidsDsp(dsp string) BidsOption {
 	return func(opts *bidsOptionImpl) {
 		opts.dsp = dsp
+	}
+}
+func BidsDspFlag(dsp *string) BidsOption {
+	return func(opts *bidsOptionImpl) {
+		opts.dsp = *dsp
 	}
 }
 
@@ -28,10 +38,20 @@ func BidsBidderUserId(bidderUserId string) BidsOption {
 		opts.bidderUserId = bidderUserId
 	}
 }
+func BidsBidderUserIdFlag(bidderUserId *string) BidsOption {
+	return func(opts *bidsOptionImpl) {
+		opts.bidderUserId = *bidderUserId
+	}
+}
 
 func BidsLastEvaluatedKey(lastEvaluatedKey LastEvaluatedKeyInfo) BidsOption {
 	return func(opts *bidsOptionImpl) {
 		opts.lastEvaluatedKey = lastEvaluatedKey
+	}
+}
+func BidsLastEvaluatedKeyFlag(lastEvaluatedKey *LastEvaluatedKeyInfo) BidsOption {
+	return func(opts *bidsOptionImpl) {
+		opts.lastEvaluatedKey = *lastEvaluatedKey
 	}
 }
 

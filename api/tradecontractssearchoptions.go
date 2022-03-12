@@ -1,6 +1,6 @@
 package api
 
-//go:generate genopts --opt_type=TradeContractsSearchOption --prefix=TradeContractsSearch --outfile=tradecontractssearchoptions.go "page:int" "size:int" "dsp:string" "genre:string" "minimumFollowers:int" "maximumFollowers:int"
+//go:generate genopts --prefix=TradeContractsSearch --outfile=api/tradecontractssearchoptions.go "page:int" "size:int" "dsp:string" "genre:string" "minimumFollowers:int" "maximumFollowers:int"
 
 type TradeContractsSearchOption func(*tradeContractsSearchOptionImpl)
 
@@ -18,10 +18,20 @@ func TradeContractsSearchPage(page int) TradeContractsSearchOption {
 		opts.page = page
 	}
 }
+func TradeContractsSearchPageFlag(page *int) TradeContractsSearchOption {
+	return func(opts *tradeContractsSearchOptionImpl) {
+		opts.page = *page
+	}
+}
 
 func TradeContractsSearchSize(size int) TradeContractsSearchOption {
 	return func(opts *tradeContractsSearchOptionImpl) {
 		opts.size = size
+	}
+}
+func TradeContractsSearchSizeFlag(size *int) TradeContractsSearchOption {
+	return func(opts *tradeContractsSearchOptionImpl) {
+		opts.size = *size
 	}
 }
 
@@ -30,10 +40,20 @@ func TradeContractsSearchDsp(dsp string) TradeContractsSearchOption {
 		opts.dsp = dsp
 	}
 }
+func TradeContractsSearchDspFlag(dsp *string) TradeContractsSearchOption {
+	return func(opts *tradeContractsSearchOptionImpl) {
+		opts.dsp = *dsp
+	}
+}
 
 func TradeContractsSearchGenre(genre string) TradeContractsSearchOption {
 	return func(opts *tradeContractsSearchOptionImpl) {
 		opts.genre = genre
+	}
+}
+func TradeContractsSearchGenreFlag(genre *string) TradeContractsSearchOption {
+	return func(opts *tradeContractsSearchOptionImpl) {
+		opts.genre = *genre
 	}
 }
 
@@ -42,10 +62,20 @@ func TradeContractsSearchMinimumFollowers(minimumFollowers int) TradeContractsSe
 		opts.minimumFollowers = minimumFollowers
 	}
 }
+func TradeContractsSearchMinimumFollowersFlag(minimumFollowers *int) TradeContractsSearchOption {
+	return func(opts *tradeContractsSearchOptionImpl) {
+		opts.minimumFollowers = *minimumFollowers
+	}
+}
 
 func TradeContractsSearchMaximumFollowers(maximumFollowers int) TradeContractsSearchOption {
 	return func(opts *tradeContractsSearchOptionImpl) {
 		opts.maximumFollowers = maximumFollowers
+	}
+}
+func TradeContractsSearchMaximumFollowersFlag(maximumFollowers *int) TradeContractsSearchOption {
+	return func(opts *tradeContractsSearchOptionImpl) {
+		opts.maximumFollowers = *maximumFollowers
 	}
 }
 
