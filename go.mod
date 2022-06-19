@@ -10,12 +10,11 @@ require (
 	github.com/TylerBrock/colorjson v0.0.0-20200706003622-8a50f05110d2
 	github.com/fatih/color v1.13.0
 	github.com/pkg/errors v0.9.1
-	github.com/spudtrooper/goutil v0.1.47
+	github.com/spudtrooper/goutil v0.1.89
 	github.com/spudtrooper/minimalcli v0.0.0-20220218140555-74daced67dea
 )
 
 require (
-	github.com/hokaccha/go-prettyjson v0.0.0-20211117102719-0474bc63780f // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/thomaso-mirodin/intmath v0.0.0-20160323211736-5dc6d854e46e // indirect

@@ -2,13 +2,12 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"sync"
 
-	colorjson "github.com/TylerBrock/colorjson"
 	"github.com/spudtrooper/goutil/check"
 	"github.com/spudtrooper/goutil/flags"
+	goutiljson "github.com/spudtrooper/goutil/json"
 	"github.com/spudtrooper/goutil/parallel"
 	minimalcli "github.com/spudtrooper/minimalcli/app"
 	"github.com/spudtrooper/scplanner/api"
@@ -294,13 +293,7 @@ func requireStringFlag(flag *string, name string) {
 }
 
 func mustFormatString(x interface{}) string {
-	b, err := json.Marshal(x)
+	s, err := goutiljson.ColorMarshal(x)
 	check.Err(err)
-	var obj map[string]interface{}
-	json.Unmarshal(b, &obj)
-	f := colorjson.NewFormatter()
-	f.Indent = 2
-	s, err := f.Marshal(obj)
-	check.Err(err)
-	return string(s)
+	return s
 }
