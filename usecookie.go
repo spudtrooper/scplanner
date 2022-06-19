@@ -11,6 +11,7 @@ import (
 	"flag"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	"github.com/spudtrooper/goutil/check"
 	"github.com/spudtrooper/scplanner/api"
@@ -24,6 +25,7 @@ func findToken(cookie string) (string, error) {
 			return "", errors.Errorf("invalid cookie part: %s", part)
 		}
 		key, val := parts[0], parts[1]
+		log.Printf("%s = %s", color.RedString(key), color.YellowString(val))
 		if key != "jwt" {
 			continue
 		}

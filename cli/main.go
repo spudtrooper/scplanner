@@ -1,14 +1,12 @@
 package cli
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"flag"
-	"strings"
 	"sync"
 
-	"github.com/pkg/errors"
+	colorjson "github.com/TylerBrock/colorjson"
 	"github.com/spudtrooper/goutil/check"
 	"github.com/spudtrooper/goutil/flags"
 	"github.com/spudtrooper/goutil/parallel"
@@ -109,7 +107,7 @@ func Main(ctx context.Context) error {
 		parallel.WaitFor(func() {
 			for rs := range bidss {
 				for _, r := range rs.Results {
-					log.Printf("result: %v %v", rs.Offset, r)
+					log.Printf("result: %v %s", rs.Offset, mustFormatString((r)))
 				}
 			}
 		}, func() {
@@ -294,19 +292,11 @@ func requireStringFlag(flag *string, name string) {
 func mustFormatString(x interface{}) string {
 	b, err := json.Marshal(x)
 	check.Err(err)
-	res, err := prettyPrintJSON(b)
+	var obj map[string]interface{}
+	json.Unmarshal(b, &obj)
+	f := colorjson.NewFormatter()
+	f.Indent = 2
+	s, err := f.Marshal(obj)
 	check.Err(err)
-	return res
-}
-
-func prettyPrintJSON(b []byte) (string, error) {
-	b = []byte(strings.TrimSpace(string(b)))
-	if len(b) == 0 {
-		return "", nil
-	}
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, b, "", "\t"); err != nil {
-		return "", errors.Errorf("json.Indent: payload=%q: %v", string(b), err)
-	}
-	return prettyJSON.String(), nil
+	return string(s)
 }
