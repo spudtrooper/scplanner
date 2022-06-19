@@ -261,7 +261,11 @@ func Main(ctx context.Context) error {
 						if err != nil {
 							log.Printf("error: %v", err)
 						} else {
-							log.Printf("created bid: %s", bidInfo.ID)
+							if bidInfo.ID != "" {
+								log.Printf("created bid: %s", bidInfo.ID)
+							} else {
+								log.Printf("created bid with empty ID: %s for results %s", mustFormatString(bidInfo), mustFormatString(r))
+							}
 						}
 					}
 				}()
