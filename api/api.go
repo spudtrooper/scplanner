@@ -48,6 +48,7 @@ func MakeClientFromFlags() (*core, error) {
 	return nil, errors.Errorf("Must set --user & --token or --creds_file")
 }
 
+//go:generate genopts --function MakeClient "debug:bool"
 func MakeClient(userID, token string, mOpts ...MakeClientOption) *core {
 	opts := MakeMakeClientOptions(mOpts...)
 	return &core{
@@ -108,6 +109,8 @@ type param struct {
 	key string
 	val interface{}
 }
+
+//go:generate genopts --function Request "extraHeaders:map[string]string" "host:string" "customPayload:interface{}"
 
 func createRoute(base string, ps ...param) string {
 	if len(ps) == 0 {

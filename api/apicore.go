@@ -153,6 +153,7 @@ type BidsResult struct {
 	RetryCount           int          `json:"retryCount"`
 }
 
+//go:generate genopts --function Bids --params "status:string" "dsp:string" "bidderUserId:string" "lastEvaluatedKey:LastEvaluatedKeyInfo"
 func (c *core) Bids(cOpts ...BidsOption) (*BidsInfo, error) {
 	opts := MakeBidsOptions(cOpts...)
 	status := or.String(opts.Status(), "PENDING")
@@ -220,6 +221,7 @@ type UserInfo struct {
 	} `json:"subscriptions"`
 }
 
+//go:generate genopts --function Auth --params
 func (c *core) Auth() (*AuthInfo, error) {
 	route := createRoute("auth/me")
 	var payload AuthInfo
@@ -275,6 +277,7 @@ type TradeContractsInfo struct {
 	MaximumFollowers   int    `json:"maximumFollowers"`
 }
 
+//go:generate genopts --function TradeContractsSearch --params "page:int" "size:int" "dsp:string" "genre:string" "minimumFollowers:int" "maximumFollowers:int"
 func (c *core) TradeContracts(id string) (*TradeContractsInfo, error) {
 	route := createRoute(fmt.Sprintf("tradeContracts/%s", id))
 	var payload TradeContractsInfo
@@ -284,6 +287,7 @@ func (c *core) TradeContracts(id string) (*TradeContractsInfo, error) {
 	return &payload, nil
 }
 
+//go:generate genopts --function Resolve --params --required "url string"
 func (c *core) Resolve(url string) (*TargetInfo, error) {
 	route := createRoute("resolve", param{"url", url})
 	var payload TargetInfo
@@ -353,6 +357,7 @@ type BidInfo struct {
 	RetryCount           int          `json:"retryCount"`
 }
 
+//go:generate genopts --function CreateBid "dsp:string" "bidderUserId:string" "contractID:string" "debugBody"
 func (c *core) CreateBid(contractId string, auth AuthInfo, bidMedia TargetInfo, cOpts ...CreateBidOption) (*BidInfo, error) {
 	opts := MakeCreateBidOptions(cOpts...)
 	dsp := or.String(opts.Dsp(), "SOUNDCLOUD")
@@ -421,6 +426,7 @@ func (c *core) CreateBid(contractId string, auth AuthInfo, bidMedia TargetInfo, 
 	return &payload, nil
 }
 
+//go:generate genopts --function Bid --params --required "contractId string, auth AuthInfo, bidMedia TargetInfo"  "dsp:string" "bidderUserId:string" "contractID:string" "debugBody"
 func (c *core) Bid(contractId string, auth AuthInfo, bidMedia TargetInfo, cOpts ...BidOption) (*BidInfo, error) {
 	opts := MakeBidOptions(cOpts...)
 	dsp := or.String(opts.Dsp(), "SOUNDCLOUD")
@@ -489,6 +495,7 @@ func (c *core) Bid(contractId string, auth AuthInfo, bidMedia TargetInfo, cOpts 
 	return &payload, nil
 }
 
+//go:generate genopts --function DeleteBid --params "status:string" "dsp:string" "bidderUserId:string" "lastEvaluatedKey:LastEvaluatedKeyInfo"
 func (c *core) DeleteBid(contractID string) (interface{}, error) {
 	route := createRoute(fmt.Sprintf("bids/%s", contractID))
 	var payload interface{}
